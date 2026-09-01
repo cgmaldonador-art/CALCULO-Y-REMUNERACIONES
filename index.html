@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluación cronometrada · Módulo 2 · Remuneración, Finiquitos y Obligaciones Laborales</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root{
+    --navy:#16243f;
+    --navy-2:#1f345c;
+    --gold:#b6842c;
+    --gold-light:#e9c98a;
+    --paper:#fbfaf7;
+    --ink:#1c2331;
+    --muted:#5b6472;
+    --line:#d9dce3;
+    --green:#2c6e49;
+    --green-bg:#e9f4ee;
+    --red:#a3352b;
+    --red-bg:#fbeceb;
+    --amber:#a3671a;
+    --amber-bg:#fbeee0;
+    --card:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.55;
+  }
+  h1,h2,h3{font-family:'Source Serif 4', Georgia, serif; font-weight:700; margin:0;}
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px 80px;}
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  header.hero{
+    background:linear-gradient(160deg,var(--navy) 0%, var(--navy-2) 100%);
+    color:#f4f1ea;
+    padding:44px 24px 34px;
+  }
+  header.hero .wrap{padding:0;}
+  .eyebrow-line{
+    display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;
+    font-size:.85rem;color:var(--gold-light);margin-bottom:16px;
+  }
+  header.hero h1{font-size:1.55rem;line-height:1.3;max-width:600px;}
+  header.hero p.lead{margin-top:12px;max-width:580px;color:#dfe2ea;font-size:.98rem;}
+
+  /* ---------- intro screen ---------- */
+  .id-panel{
+    background:var(--card);border:1px solid var(--line);border-radius:6px;
+    margin-top:-24px;padding:22px 24px;
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;
+    box-shadow:0 10px 24px rgba(22,36,63,.08);
+  }
+  .id-field label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.05em;}
+  .id-field input{width:100%;border:none;border-bottom:2px solid var(--line);padding:6px 2px;font-family:inherit;font-size:1rem;background:transparent;color:var(--ink);}
+  .id-field input:focus{outline:none;border-bottom-color:var(--gold);}
+
+  .rules{
+    margin-top:32px;background:#f2ede0;border-left:4px solid var(--gold);
+    border-radius:4px;padding:20px 22px;font-size:.94rem;color:#3a3327;
+  }
+  .rules h3{font-size:1.05rem;color:var(--navy);margin-bottom:10px;}
+  .rules ul{margin:0;padding-left:20px;}
+  .rules li{margin-bottom:6px;}
+
+  .struct-table{width:100%;border-collapse:collapse;margin-top:22px;font-size:.9rem;}
+  .struct-table th,.struct-table td{border-top:1px solid var(--line);padding:10px 12px;text-align:left;}
+  .struct-table th{color:var(--muted);font-weight:600;background:#fafaf7;}
+
+  button.primary,button.secondary{
+    font-family:'Inter',sans-serif;font-size:.95rem;font-weight:600;
+    padding:13px 26px;border-radius:5px;cursor:pointer;border:none;
+  }
+  button.primary{background:var(--navy);color:#fff;}
+  button.primary:hover{background:var(--navy-2);}
+  button.primary:disabled{background:#a9afbc;cursor:not-allowed;}
+  button.secondary{background:transparent;color:var(--navy);border:1.5px solid var(--navy);}
+  button.secondary:hover{background:#eef1f6;}
+
+  .actions{margin-top:32px;display:flex;gap:14px;flex-wrap:wrap;}
+
+  /* ---------- quiz screen ---------- */
+  .quiz-topbar{
+    position:sticky;top:0;background:var(--paper);
+    padding:16px 0 12px;z-index:5;border-bottom:1px solid var(--line);
+    margin-bottom:24px;
+  }
+  .quiz-meta{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;color:var(--muted);margin-bottom:10px;}
+  .timer-box{display:flex;align-items:center;gap:8px;font-family:'Source Serif 4',serif;font-weight:700;font-size:1.3rem;color:var(--navy);}
+  .timer-box.warn{color:var(--amber);}
+  .timer-box.danger{color:var(--red);}
+  .progress-outer{height:6px;background:var(--line);border-radius:3px;overflow:hidden;}
+  .progress-inner{height:100%;background:var(--navy);width:0%;transition:width .3s linear;}
+  .time-outer{height:5px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:8px;}
+  .time-inner{height:100%;background:var(--gold);width:100%;transition:width 1s linear;}
+  .time-inner.warn{background:var(--amber);}
+  .time-inner.danger{background:var(--red);}
+
+  .section-tag{
+    display:inline-block;font-size:.75rem;font-weight:700;letter-spacing:.04em;
+    color:var(--gold);text-transform:uppercase;margin-bottom:10px;
+  }
+  .q-card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:26px 26px 22px;}
+  .q-card .q-text{font-size:1.12rem;color:var(--ink);margin-bottom:20px;}
+  .q-pts-tag{float:right;font-size:.78rem;color:var(--muted);}
+
+  .opt-label{
+    display:flex;align-items:center;gap:12px;cursor:pointer;
+    padding:12px 14px;border-radius:6px;border:1px solid var(--line);margin-bottom:10px;
+    transition:background .15s,border-color .15s;
+  }
+  .opt-label:hover{background:#f3f3ee;}
+  .opt-label input{accent-color:var(--navy);width:17px;height:17px;flex-shrink:0;}
+  .opt-label.picked{border-color:var(--navy);background:#eef1f6;}
+
+  textarea{
+    width:100%;min-height:220px;border:1px solid var(--line);border-radius:6px;
+    padding:14px;font-family:inherit;font-size:.98rem;color:var(--ink);resize:vertical;
+  }
+  textarea:focus{outline:none;border-color:var(--navy);}
+
+  .rubric{margin-top:16px;border:1px solid var(--line);border-radius:5px;overflow:hidden;}
+  .rubric summary{cursor:pointer;padding:10px 14px;background:#f2ede0;font-size:.86rem;font-weight:600;color:#3a3327;list-style:none;}
+  .rubric summary::-webkit-details-marker{display:none;}
+  .rubric summary::before{content:"▸ ";color:var(--gold);}
+  .rubric[open] summary::before{content:"▾ ";}
+  .rubric table{width:100%;border-collapse:collapse;font-size:.85rem;}
+  .rubric th,.rubric td{border-top:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;}
+  .rubric th{background:#fafaf7;color:var(--muted);font-weight:600;width:110px;}
+  .rubric td.pts{width:60px;font-weight:700;color:var(--navy);text-align:center;}
+
+  .quiz-actions{margin-top:22px;display:flex;justify-content:flex-end;gap:12px;}
+
+  /* ---------- end screen ---------- */
+  .score-card{
+    background:var(--navy);color:#f4f1ea;border-radius:8px;padding:34px 30px;
+    display:flex;flex-wrap:wrap;gap:26px;align-items:center;margin-top:20px;
+  }
+  .score-num{font-family:'Source Serif 4',serif;font-size:3rem;font-weight:700;color:var(--gold-light);line-height:1;}
+  .score-meta{flex:1;min-width:220px;}
+  .score-meta h3{color:#fff;font-size:1.15rem;}
+  .score-meta p{margin:6px 0 0;color:#c9cedb;font-size:.9rem;}
+
+  .pending-note{
+    margin-top:20px;padding:18px 20px;background:var(--amber-bg);color:var(--amber);
+    border-radius:6px;font-size:.92rem;border-left:4px solid var(--amber);
+  }
+
+  footer{margin-top:52px;padding-top:20px;border-top:1px solid var(--line);font-size:.8rem;color:var(--muted);text-align:center;}
+
+  @media (max-width:600px){
+    header.hero h1{font-size:1.3rem;}
+    .score-num{font-size:2.2rem;}
+    .q-card{padding:20px 18px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow-line">
+      <span>Recursos Humanos · Nivel 4° Medio</span>
+      <span>Módulo 2</span>
+    </div>
+    <h1>Evaluación cronometrada: Cálculo de Remuneración, Finiquitos y Obligaciones Laborales</h1>
+    <p class="lead">Evaluación integradora de las actividades 9 a 14, con tiempo individual por pregunta.</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ PANTALLA 1: INTRO ============ -->
+  <div class="screen active" id="screen-intro">
+    <div class="id-panel">
+      <div class="id-field">
+        <label for="nombre">Nombre del estudiante</label>
+        <input type="text" id="nombre" placeholder="Nombre y apellido">
+      </div>
+      <div class="id-field">
+        <label for="curso">Curso</label>
+        <input type="text" id="curso" placeholder="4° Medio ...">
+      </div>
+    </div>
+
+    <div class="rules">
+      <h3>Antes de comenzar</h3>
+      <ul>
+        <li>Cada pregunta tiene <strong>tiempo individual</strong>. Al agotarse el tiempo, la pregunta se guarda automáticamente (respondida o en blanco) y avanzas a la siguiente.</li>
+        <li>No es posible retroceder ni volver a una pregunta ya respondida.</li>
+        <li>No verás si tus respuestas de verdadero/falso o selección única son correctas durante la prueba: <strong>solo conocerás tu puntaje al finalizar</strong>.</li>
+        <li>Las preguntas de desarrollo son evaluadas por tu docente con la rúbrica adjunta a cada una; ese puntaje se sumará después.</li>
+        <li>No cierres ni recargues esta página durante la prueba: se perdería tu progreso.</li>
+        <li>Completa tu nombre y curso para habilitar el inicio.</li>
+      </ul>
+    </div>
+
+    <table class="struct-table">
+      <tr><th>Sección</th><th>Preguntas</th><th>Tiempo c/u</th><th>Puntaje</th></tr>
+      <tr><td>I. Verdadero y falso</td><td>5</td><td>4 minutos</td><td>5 pts</td></tr>
+      <tr><td>II. Selección única</td><td>5</td><td>4 minutos</td><td>10 pts</td></tr>
+      <tr><td>III. Desarrollo (rúbrica)</td><td>4</td><td>10 minutos</td><td>16 pts</td></tr>
+    </table>
+
+    <div class="actions">
+      <button class="primary" id="btnStart" onclick="startQuiz()" disabled>Comenzar evaluación</button>
+    </div>
+  </div>
+
+  <!-- ============ PANTALLA 2: QUIZ ============ -->
+  <div class="screen" id="screen-quiz">
+    <div class="quiz-topbar">
+      <div class="quiz-meta">
+        <span id="qCounter">Pregunta 1 de 14</span>
+        <span class="timer-box" id="timerBox">04:00</span>
+      </div>
+      <div class="progress-outer"><div class="progress-inner" id="progressBar"></div></div>
+      <div class="time-outer"><div class="time-inner" id="timeBar"></div></div>
+    </div>
+
+    <div id="quizBody"></div>
+
+    <div class="quiz-actions">
+      <button class="primary" id="btnNext" onclick="nextQuestion()">Siguiente pregunta</button>
+    </div>
+  </div>
+
+  <!-- ============ PANTALLA 3: FIN ============ -->
+  <div class="screen" id="screen-end">
+    <div class="score-card">
+      <div>
+        <div class="score-num" id="finalScore">0 / 15</div>
+        <div style="font-size:.8rem;color:#c9cedb;margin-top:4px;">puntaje secciones I y II</div>
+      </div>
+      <div class="score-meta">
+        <h3>Evaluación finalizada</h3>
+        <p id="finalMsg">Gracias por completar la prueba.</p>
+      </div>
+    </div>
+
+    <div class="pending-note">
+      Las 4 preguntas de desarrollo (16 pts) quedan pendientes de evaluación por parte de tu docente, según la rúbrica de cada pregunta. Tu nota final se calculará una vez sumado ese puntaje.
+    </div>
+
+    <div class="actions">
+      <button class="primary" onclick="descargarRespuestas()">Descargar mis respuestas</button>
+      <button class="secondary" onclick="window.print()">Imprimir / Guardar como PDF</button>
+    </div>
+  </div>
+
+  <footer>
+    Módulo 2 · Recursos Humanos, 4° Medio — Cálculo de Remuneración, Finiquitos y Obligaciones Laborales
+  </footer>
+</div>
+
+<script>
+/* ==================== CONFIGURACIÓN DE TIEMPOS ====================
+   Edita estos valores (en minutos) si necesitas ajustarlos.        */
+const TIME_VF_MIN    = 4;
+const TIME_SU_MIN     = 4;
+const TIME_OPEN_MIN   = 10;
+/* =================================================================== */
+
+const QUESTIONS = [
+  // ---- SECCIÓN I: VERDADERO Y FALSO ----
+  {section:"I. Verdadero y falso", type:"vf", id:"vf1", pts:1, timeMin:TIME_VF_MIN,
+   text:"El feriado legal o anual corresponde a un período de 15 días hábiles por cada año de servicio, con derecho a remuneración íntegra.",
+   correct:"V"},
+  {section:"I. Verdadero y falso", type:"vf", id:"vf2", pts:1, timeMin:TIME_VF_MIN,
+   text:"El feriado proporcional puede fraccionarse libremente, según lo necesite el empleador o el trabajador.",
+   correct:"F"},
+  {section:"I. Verdadero y falso", type:"vf", id:"vf3", pts:1, timeMin:TIME_VF_MIN,
+   text:"El empleador puede descontar del finiquito los saldos de créditos de la Caja de Compensación sin necesidad de autorización del trabajador.",
+   correct:"F"},
+  {section:"I. Verdadero y falso", type:"vf", id:"vf4", pts:1, timeMin:TIME_VF_MIN,
+   text:"El Seguro de Invalidez y Sobrevivencia (SIS), equivalente al 1,99% de la remuneración imponible, es de cargo del empleador.",
+   correct:"V"},
+  {section:"I. Verdadero y falso", type:"vf", id:"vf5", pts:1, timeMin:TIME_VF_MIN,
+   text:"El Impuesto Único de Segunda Categoría tiene carácter progresivo: a mayor base tributable, mayor es la tasa aplicada.",
+   correct:"V"},
+
+  // ---- SECCIÓN II: SELECCIÓN ÚNICA ----
+  {section:"II. Selección única", type:"su", id:"su1", pts:2, timeMin:TIME_SU_MIN,
+   text:"¿Cuántos días hábiles de feriado legal corresponden a un trabajador por cada año de servicio cumplido?",
+   options:{a:"10 días hábiles", b:"12 días hábiles", c:"15 días hábiles", d:"20 días hábiles"},
+   correct:"c"},
+  {section:"II. Selección única", type:"su", id:"su2", pts:2, timeMin:TIME_SU_MIN,
+   text:"¿Cómo define la Dirección del Trabajo el documento por el cual un trabajador y un empleador ratifican, ante un Ministro de Fe, el término de la relación laboral?",
+   options:{a:"Contrato de trabajo", b:"Liquidación de sueldo", c:"Finiquito", d:"Certificado de cotizaciones"},
+   correct:"c"},
+  {section:"II. Selección única", type:"su", id:"su3", pts:2, timeMin:TIME_SU_MIN,
+   text:"¿Cuál es la tasa de aporte patronal por Seguro de Cesantía en un contrato de trabajo indefinido?",
+   options:{a:"3%", b:"2,4%", c:"1,99%", d:"0,93%"},
+   correct:"b"},
+  {section:"II. Selección única", type:"su", id:"su4", pts:2, timeMin:TIME_SU_MIN,
+   text:"¿Cuál de los siguientes NO forma parte del sistema previsional chileno?",
+   options:{a:"AFP", b:"Seguro de Cesantía", c:"Sistema Previsional de Salud", d:"Seguro automotriz"},
+   correct:"d"},
+  {section:"II. Selección única", type:"su", id:"su5", pts:2, timeMin:TIME_SU_MIN,
+   text:"Según el Art. 163 del Código del Trabajo, la indemnización legal por años de servicio equivale a:",
+   options:{a:"15 días de remuneración por año de servicio", b:"20 días de remuneración por año de servicio", c:"30 días de remuneración por año de servicio", d:"45 días de remuneración por año de servicio"},
+   correct:"c"},
+
+  // ---- SECCIÓN III: DESARROLLO ----
+  {section:"III. Desarrollo", type:"open", id:"open1", pts:4, timeMin:TIME_OPEN_MIN,
+   text:"Explica qué es el feriado proporcional y en qué situación un trabajador tiene derecho a este beneficio al término de su contrato.",
+   rubric:[
+     ["Excelente","Explica con precisión qué es el feriado proporcional, indica que se aplica cuando el trabajador deja de prestar servicios antes de completar el año, y usa correctamente terminología técnica (Art. 73 CT, anualidad, días hábiles).","4"],
+     ["Bueno","Explica correctamente el concepto y la situación en que aplica, pero con imprecisiones menores o sin mencionar la base legal.","3"],
+     ["Regular","Menciona el concepto de forma parcial o confunde feriado proporcional con feriado legal/progresivo.","2"],
+     ["Por mejorar","La respuesta es incompleta, imprecisa o no logra explicar el concepto solicitado.","1"]
+   ]},
+  {section:"III. Desarrollo", type:"open", id:"open2", pts:4, timeMin:TIME_OPEN_MIN,
+   text:"Describe al menos tres requisitos que debe cumplir un finiquito para ser válido legalmente, de acuerdo al Código del Trabajo.",
+   rubric:[
+     ["Excelente","Describe con claridad tres o más requisitos (ser por escrito, ratificación ante Ministro de Fe, acreditación de cotizaciones al día, firma del trabajador) y explica su importancia legal.","4"],
+     ["Bueno","Describe correctamente tres requisitos, con explicación general y sin profundizar en su fundamento legal.","3"],
+     ["Regular","Menciona solo uno o dos requisitos, o los describe de forma poco clara.","2"],
+     ["Por mejorar","La respuesta no identifica requisitos válidos o es incorrecta.","1"]
+   ]},
+  {section:"III. Desarrollo", type:"open", id:"open3", pts:4, timeMin:TIME_OPEN_MIN,
+   text:"Explica la diferencia entre los descuentos previsionales (legales) y los descuentos convencionales (variables) que se pueden aplicar en una liquidación de sueldo o finiquito.",
+   rubric:[
+     ["Excelente","Distingue con claridad ambos tipos de descuento, entrega ejemplos correctos de cada uno (AFP, salud, seguro de cesantía vs. crédito CCAF, retención judicial, cuota sindical) y explica que los convencionales requieren autorización del trabajador.","4"],
+     ["Bueno","Distingue ambos tipos de descuento y entrega al menos un ejemplo de cada uno, con explicación general correcta.","3"],
+     ["Regular","Identifica la diferencia de forma imprecisa o entrega ejemplos incompletos o incorrectos.","2"],
+     ["Por mejorar","No logra diferenciar ambos conceptos o la respuesta es errónea.","1"]
+   ]},
+  {section:"III. Desarrollo", type:"open", id:"open4", pts:4, timeMin:TIME_OPEN_MIN,
+   text:"Analiza la importancia del aporte patronal para el sistema de seguridad social en Chile y menciona al menos dos de los componentes que lo conforman.",
+   rubric:[
+     ["Excelente","Argumenta con claridad la importancia del aporte patronal para el financiamiento de la seguridad social y menciona correctamente dos o más componentes (SIS, seguro de cesantía, mutualidad, trabajo pesado).","4"],
+     ["Bueno","Explica la importancia de forma general y menciona al menos un componente correcto.","3"],
+     ["Regular","La argumentación es superficial o los componentes mencionados son imprecisos.","2"],
+     ["Por mejorar","No logra argumentar la importancia del aporte patronal ni identificar sus componentes.","1"]
+   ]}
+];
+
+let current = 0;
+let answers = {};
+let timerInterval = null;
+let remaining = 0;
+let questionTotal = 0;
+
+document.getElementById('nombre').addEventListener('input', checkStart);
+document.getElementById('curso').addEventListener('input', checkStart);
+function checkStart(){
+  const ok = document.getElementById('nombre').value.trim().length > 1 &&
+             document.getElementById('curso').value.trim().length > 1;
+  document.getElementById('btnStart').disabled = !ok;
+}
+
+function startQuiz(){
+  document.getElementById('screen-intro').classList.remove('active');
+  document.getElementById('screen-quiz').classList.add('active');
+  current = 0;
+  renderQuestion();
+}
+
+function fmt(sec){
+  const m = Math.floor(sec/60).toString().padStart(2,'0');
+  const s = Math.floor(sec%60).toString().padStart(2,'0');
+  return m+':'+s;
+}
+
+function renderQuestion(){
+  clearInterval(timerInterval);
+  const q = QUESTIONS[current];
+  questionTotal = q.timeMin * 60;
+  remaining = questionTotal;
+
+  document.getElementById('qCounter').textContent = 'Pregunta ' + (current+1) + ' de ' + QUESTIONS.length + ' · ' + q.section;
+  document.getElementById('progressBar').style.width = (current / QUESTIONS.length * 100) + '%';
+  document.getElementById('btnNext').textContent = (current === QUESTIONS.length - 1) ? 'Finalizar evaluación' : 'Siguiente pregunta';
+
+  let html = '<div class="q-card"><span class="q-pts-tag">' + q.pts + ' pts</span>';
+  html += '<div class="q-text">' + q.text + '</div>';
+
+  if(q.type === 'vf'){
+    html += optionRow(q.id, 'V', 'Verdadero') + optionRow(q.id, 'F', 'Falso');
+  } else if(q.type === 'su'){
+    Object.keys(q.options).forEach(k=>{
+      html += optionRow(q.id, k, k + ') ' + q.options[k]);
+    });
+  } else if(q.type === 'open'){
+    html += '<textarea id="ta_'+q.id+'" placeholder="Escribe tu respuesta aquí..."></textarea>';
+    html += '<details class="rubric"><summary>Ver rúbrica de evaluación</summary><table>';
+    html += '<tr><th>Nivel</th><th>Descriptor</th><th class="pts">Ptje.</th></tr>';
+    q.rubric.forEach(r=>{
+      html += '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td class="pts">'+r[2]+'</td></tr>';
+    });
+    html += '</table></details>';
+  }
+  html += '</div>';
+  document.getElementById('quizBody').innerHTML = html;
+
+  if(q.type !== 'open'){
+    document.querySelectorAll('.opt-label').forEach(lbl=>{
+      lbl.addEventListener('click', ()=>{
+        document.querySelectorAll('.opt-label').forEach(l=>l.classList.remove('picked'));
+        lbl.classList.add('picked');
+      });
+    });
+  }
+
+  updateTimerDisplay();
+  timerInterval = setInterval(tick, 1000);
+}
+
+function optionRow(name, value, label){
+  return '<label class="opt-label"><input type="radio" name="'+name+'" value="'+value+'"> '+label+'</label>';
+}
+
+function tick(){
+  remaining -= 1;
+  if(remaining <= 0){
+    remaining = 0;
+    updateTimerDisplay();
+    clearInterval(timerInterval);
+    nextQuestion();
+    return;
+  }
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay(){
+  const box = document.getElementById('timerBox');
+  const bar = document.getElementById('timeBar');
+  box.textContent = fmt(remaining);
+  const pct = (remaining / questionTotal) * 100;
+  bar.style.width = pct + '%';
+  box.classList.remove('warn','danger');
+  bar.classList.remove('warn','danger');
+  if(pct <= 15){ box.classList.add('danger'); bar.classList.add('danger'); }
+  else if(pct <= 35){ box.classList.add('warn'); bar.classList.add('warn'); }
+}
+
+function saveCurrentAnswer(){
+  const q = QUESTIONS[current];
+  if(q.type === 'open'){
+    const ta = document.getElementById('ta_'+q.id);
+    answers[q.id] = ta ? ta.value : '';
+  } else {
+    const sel = document.querySelector('input[name="'+q.id+'"]:checked');
+    answers[q.id] = sel ? sel.value : null;
+  }
+}
+
+function nextQuestion(){
+  clearInterval(timerInterval);
+  saveCurrentAnswer();
+  current += 1;
+  if(current >= QUESTIONS.length){
+    finishQuiz();
+  } else {
+    renderQuestion();
+  }
+}
+
+function finishQuiz(){
+  document.getElementById('screen-quiz').classList.remove('active');
+  document.getElementById('screen-end').classList.add('active');
+
+  let score = 0;
+  QUESTIONS.forEach(q=>{
+    if(q.type === 'vf' || q.type === 'su'){
+      if(answers[q.id] === q.correct) score += q.pts;
+    }
+  });
+
+  document.getElementById('finalScore').textContent = score + ' / 15';
+  document.getElementById('finalMsg').textContent =
+    'Estudiante: ' + document.getElementById('nombre').value.trim() +
+    ' · Curso: ' + document.getElementById('curso').value.trim();
+}
+
+function descargarRespuestas(){
+  const nombre = document.getElementById('nombre').value.trim();
+  const curso = document.getElementById('curso').value.trim();
+  const fecha = new Date().toLocaleString('es-CL');
+
+  let out = 'EVALUACIÓN MÓDULO 2 — RECURSOS HUMANOS 4° MEDIO\n';
+  out += 'Cálculo de Remuneración, Finiquitos y Obligaciones Laborales\n';
+  out += '================================================\n';
+  out += 'Estudiante: ' + nombre + '\n';
+  out += 'Curso: ' + curso + '\n';
+  out += 'Fecha de entrega: ' + fecha + '\n';
+  out += '================================================\n\n';
+
+  let sec = '';
+  QUESTIONS.forEach((q, idx)=>{
+    if(q.section !== sec){
+      sec = q.section;
+      out += '\n--- ' + sec + ' ---\n\n';
+    }
+    out += (idx+1) + '. ' + q.text + '\n';
+    if(q.type === 'vf' || q.type === 'su'){
+      out += '   Respuesta del estudiante: ' + (answers[q.id] || '(sin responder)') + '\n\n';
+    } else {
+      out += '   Respuesta del estudiante:\n   ' + (answers[q.id] ? answers[q.id].replace(/\n/g,'\n   ') : '(sin responder)') + '\n\n';
+    }
+  });
+
+  out += '================================================\n';
+  out += 'Puntaje automático (Secciones I y II): ' + document.getElementById('finalScore').textContent + '\n';
+  out += 'Puntaje de Sección III (desarrollo): pendiente de evaluación docente / 16\n';
+
+  const blob = new Blob([out], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Respuestas_' + (nombre.replace(/\s+/g,'_') || 'estudiante') + '_Modulo2.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
